@@ -28,6 +28,12 @@ class Emitter {
     this._events = Object.create(null)
   }
   subscribe(eventName, cb) {
+    if (!(eventName instanceof String)) {
+      throw new Error('eventName should be a string')
+    }
+    if (!(cb instanceof Function)) {
+      throw new Error('callback should be a function')
+    }
     if (this._events[eventName]) {
       this._events[eventName].push(cb)
     } else {
