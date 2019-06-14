@@ -1,4 +1,4 @@
-class EmitterListener {
+class EmitterSubscription {
   constructor (_events, cbRef, eventName) {
     this.isReleased = false
     this._events = _events
@@ -7,8 +7,8 @@ class EmitterListener {
   }
 
   release() {
-    if(!this.isReleased) {
-      const eventList = this._events[this.eventName]
+    const eventList = this._events[this.eventName]
+    if(!this.isReleased && eventList) {
       for (let i = 0; i < eventList.length; i++) {
         let func = eventList[i]
         if (func === this.cbRef) {
@@ -23,7 +23,7 @@ class EmitterListener {
   }
 }
 
-class Emitter {
+export default class Emitter {
   constructor() {
     this._events = Object.create(null)
   }
@@ -39,12 +39,16 @@ class Emitter {
     } else {
       this._events[eventName] = [cb]
     }
-    return new EmitterListener(this._events, cb, eventName)
+    return new EmitterSubscription(this._events, cb, eventName)
   }
 
   emit(eventName, ...restOfParams) {
     if (this._events[eventName]) {
       this._events[eventName].forEach(func => func(...restOfParams))
     }
+  }
+
+  releaseAll() {
+    this._events = Object.create(null)
   }
 }
